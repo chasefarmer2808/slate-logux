@@ -1,6 +1,6 @@
 const { Server } = require('@logux/server');
 
-const rooms = {};
+const rooms = [];
 
 const server = new Server(
     Server.loadOptions(process, {
@@ -19,7 +19,7 @@ server.channel('rooms', {
         return true;
     },
     async load() {
-        return rooms;
+        return { type: 'INIT_ROOMS', rooms };
     }
 });
 
@@ -31,9 +31,8 @@ server.type('ADD_ROOM', {
         return { channel: `rooms` }
     },
     process(ctx, action) {
-        const roomId = action.roomId;
-        rooms[roomId] = newRoom(roomId);
-        return { type: 'ADD_ROOM', data: rooms[roomId] };
+        rooms.push(action.room);
+        return { type: 'ADD_ROOM', room: action.room };
     }
 });
 
@@ -45,21 +44,22 @@ server.type('ADD_CLIENT', {
         return { channel: `room/${action.roomId}` }
     },
     process(ctx, action) {
-        rooms[action.roomId].clients[action.clientId] = newClient(action.clientId);
-        return rooms[action.roomId];
+        const room = rooms.filter(room => room.id === action.roomId);
+        room.clients.push(newClient(action.clientId));
+        return room;
     }
 })
 
-function newRoom(id) {
-    return {
-        id,
-        clients: {},
-        noteContent: [{
-            type: 'paragraph',
-            text: 'Hello, World!'
-        }]
-    }
-}
+// function newRoom(id) {
+//     return {
+//         id,
+//         clients: [],
+//         noteContent: [{
+//             type: 'paragraph',
+//             text: 'Hello, World!'
+//         }]
+//     }
+// }
 
 function newClient(id) {
     return { id };

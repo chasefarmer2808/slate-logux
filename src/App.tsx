@@ -1,35 +1,48 @@
 import styled from "@emotion/styled";
+import { useSubscription } from "@logux/redux";
 import faker from "faker";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector, useStore } from "react-redux";
 import "./App.css";
 import Room from "./Room";
+import { GlobalState, IRoom } from "./reducers/index";
+import { Rooms } from "./Rooms";
 
 const App: React.FC = () => {
-  const [rooms, setRooms] = useState<string[]>([]);
-  const addRoom = () => setRooms(rooms.concat(faker.lorem.slug(4)));
-  const removeRoom = (room: string) => () =>
-    setRooms(rooms.filter((r) => r !== room));
+  const store = useStore();
+  const dispatch = useDispatch() as any;
+  const isSubscribing = useSubscription(["rooms"]);
+  const rooms = useSelector((state: GlobalState) => state.rooms);
+  const addRoom = () => {
+    const room: IRoom = {
+      id: faker.lorem.slug(4),
+      clients: [],
+      noteContent: [],
+    };
+    dispatch.sync({ type: "ADD_ROOM", room });
+  };
+  // TODO
+  const removeRoom = (room: string) => () => {};
 
-  useEffect(() => {
-    addRoom();
-  }, []);
-
-  return (
-    <div>
-      <Panel>
-        <AddButton type="button" onClick={addRoom}>
-          Add Room
-        </AddButton>
-      </Panel>
-      {rooms.map((room) => (
-        <Room key={room} slug={room} removeRoom={removeRoom(room)} />
-      ))}
-    </div>
-  );
+  if (isSubscribing) {
+    return <p>Loading</p>;
+  } else {
+    return (
+      <div>
+        <Panel>
+          <AddButton type="button" onClick={addRoom}>
+            Add Room
+          </AddButton>
+          <Rooms rooms={rooms} />
+        </Panel>
+      </div>
+    );
+  }
 };
 
 const Panel = styled.div`
   display: flex;
+  flex-direction: column;
 `;
 
 const Button = styled.button`
