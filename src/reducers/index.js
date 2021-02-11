@@ -1,15 +1,4 @@
-import { useStore } from 'react-redux';
-// const initialState = {
-//     noteContent: [],
-//     cursors: [],
-// };
-
 export function reducer(state, action) {
-    // if (action.type === 'INIT_NOTE') {
-    //     return {
-    //         noteContent: action.noteContent
-    //     };
-    // }
     if (action.type === 'EDIT_NOTE') {
         return {
             ...state,
