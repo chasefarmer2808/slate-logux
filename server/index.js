@@ -28,11 +28,25 @@ server.type('ADD_ROOM', {
         return true;
     },
     resend(ctx, action) {
-        return { channel: `rooms` }
+        return { channel: 'rooms' }
     },
     process(ctx, action) {
         rooms.push(action.room);
         return { type: 'ADD_ROOM', room: action.room };
+    }
+});
+
+server.type('REMOVE_ROOM', {
+    access() {
+        return true;
+    },
+    resend(ctx, action) {
+        return {channel: 'rooms'}
+    },
+    process(ctx, action) {
+        const index = rooms.findIndex(room => room.id === action.id);
+        rooms.splice(index, 1);
+        return { type: 'REMOVE_ROOM', id: action.id };
     }
 });
 

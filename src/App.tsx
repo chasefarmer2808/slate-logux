@@ -21,8 +21,9 @@ const App: React.FC = () => {
     };
     dispatch.sync({ type: "ADD_ROOM", room });
   };
-  // TODO
-  const removeRoom = (room: string) => () => {};
+  const removeRoom = (roomId: string) => {
+    dispatch.sync({ type: "REMOVE_ROOM", id: roomId });
+  };
 
   if (isSubscribing) {
     return <p>Loading</p>;
@@ -33,7 +34,7 @@ const App: React.FC = () => {
           <AddButton type="button" onClick={addRoom}>
             Add Room
           </AddButton>
-          <Rooms rooms={rooms} />
+          <Rooms rooms={rooms} removeRoom={removeRoom} />
         </Panel>
       </div>
     );

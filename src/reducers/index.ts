@@ -28,6 +28,10 @@ export function reducer(state: GlobalState = initialState, action: any) {
         state.rooms = [...state.rooms, action.room];
         return state;
     }
+    if (action.type === 'REMOVE_ROOM') {
+        state.rooms = state.rooms.filter(room => room.id !== action.id);
+        return state;
+    }
     // if (action.type === 'EDIT_NOTE') {
     //     return {
     //         ...state,
